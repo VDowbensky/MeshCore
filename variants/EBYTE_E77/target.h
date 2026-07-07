@@ -15,8 +15,8 @@ class E77Board : public STM32Board {
 public:
     void begin() override {
         STM32Board::begin();
-        pinMode(PA0, OUTPUT);
-        pinMode(PA1, OUTPUT);
+        pinMode(PB4, OUTPUT);
+        pinMode(PB5, OUTPUT);
     }
 
     const char* getManufacturerName() const override {
@@ -34,13 +34,13 @@ public:
 
     void setGpio(uint32_t values) override {
         // set led values
-        digitalWrite(PA0, values & 1);
-        digitalWrite(PA1, (values & 2) >> 1);
+        digitalWrite(PB4, values & 1);
+        digitalWrite(PB5, (values & 2) >> 1);
     }
 
     uint32_t getGpio() override {
         // get led value
-        return (digitalRead(PA1) << 1) | digitalRead(PA0);
+        return (digitalRead(PB4) << 1) | digitalRead(PB5);
     }
 };
 
