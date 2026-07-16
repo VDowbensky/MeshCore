@@ -9,6 +9,7 @@ protected:
   uint8_t btn_prev_state;
 
 public:
+  T1000eBoard() : NRF52Board("T1000E_OTA") {}
   void begin();
 
   uint16_t getBattMilliVolts() override {
@@ -34,7 +35,7 @@ public:
   }
 
   const char* getManufacturerName() const override {
-    return "Seeed Tracker T1000-e";
+    return "Seeed Tracker T1000-E";
   }
 
   int buttonStateChanged() {
@@ -42,7 +43,7 @@ public:
     uint8_t v = digitalRead(BUTTON_PIN);
     if (v != btn_prev_state) {
       btn_prev_state = v;
-      return (v == LOW) ? 1 : -1;
+      return (v == USER_BTN_PRESSED) ? 1 : -1;
     }
   #endif
     return 0;
@@ -87,8 +88,6 @@ public:
     nrf_gpio_cfg_sense_input(BUTTON_PIN, NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_SENSE_HIGH);
     #endif
 
-    sd_power_system_off();
+    NRF52Board::powerOff();
   }
-
-//  bool startOTAUpdate(const char* id, char reply[]) override;
 };

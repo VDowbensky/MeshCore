@@ -2,7 +2,7 @@
 
 #include <RadioLib.h>
 
-#define SX126X_IRQ_HEADER_VALID                     0b0000010000  //  4     4     valid LoRa header received
+#define SX126X_IRQ_HEADER_VALID                0b0000010000  //  4     4     valid LoRa header received
 #define SX126X_IRQ_PREAMBLE_DETECTED           0x04
 
 class CustomSX1268 : public SX1268 {
@@ -45,8 +45,7 @@ class CustomSX1268 : public SX1268 {
       int status = begin(LORA_FREQ, LORA_BW, LORA_SF, cr, RADIOLIB_SX126X_SYNC_WORD_PRIVATE, LORA_TX_POWER, 16, tcxo);
       // if radio init fails with -707/-706, try again with tcxo voltage set to 0.0f
       if (status == RADIOLIB_ERR_SPI_CMD_FAILED || status == RADIOLIB_ERR_SPI_CMD_INVALID) {
-        #define SX126X_DIO3_TCXO_VOLTAGE (0.0f);
-        tcxo = SX126X_DIO3_TCXO_VOLTAGE;
+        tcxo = 0.0f;
         status = begin(LORA_FREQ, LORA_BW, LORA_SF, cr, RADIOLIB_SX126X_SYNC_WORD_PRIVATE, LORA_TX_POWER, 16, tcxo);
       }
       if (status != RADIOLIB_ERR_NONE) {
@@ -67,11 +66,11 @@ class CustomSX1268 : public SX1268 {
       setRxBoostedGainMode(SX126X_RX_BOOSTED_GAIN);
   #endif
   #if defined(SX126X_RXEN) || defined(SX126X_TXEN)
-    #ifndef SX1262X_RXEN
-      #define SX1262X_RXEN RADIOLIB_NC
+    #ifndef SX126X_RXEN
+      #define SX126X_RXEN RADIOLIB_NC
     #endif
-    #ifndef SX1262X_TXEN
-      #define SX1262X_TXEN RADIOLIB_NC
+    #ifndef SX126X_TXEN
+      #define SX126X_TXEN RADIOLIB_NC
     #endif
       setRfSwitchPins(SX126X_RXEN, SX126X_TXEN);
   #endif 
@@ -83,5 +82,11 @@ class CustomSX1268 : public SX1268 {
       uint16_t irq = getIrqFlags();
       bool detected = (irq & SX126X_IRQ_HEADER_VALID) || (irq & SX126X_IRQ_PREAMBLE_DETECTED);
       return detected;
+    }
+
+    bool getRxBoostedGainMode() {
+      uint8_t rxGain = 0;
+      readRegister(RADIOLIB_SX126X_REG_RX_GAIN, &rxGain, 1);
+      return (rxGain == RADIOLIB_SX126X_RX_GAIN_BOOSTED);
     }
 };

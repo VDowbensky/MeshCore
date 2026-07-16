@@ -26,6 +26,8 @@ void setFlag(void) {
 
 void RadioLibWrapper::begin() {
   _radio->setPacketReceivedAction(setFlag);  // this is also SentComplete interrupt
+  _preamble_sf = getSpreadingFactor();
+  _radio->setPreambleLength(preambleLengthForSF(_preamble_sf)); // longer preamble for lower SF improves reliability
   state = STATE_IDLE;
 
   if (_board->getStartupReason() == BD_STARTUP_RX_PACKET) {  // received a LoRa packet (while in deep sleep)
@@ -34,10 +36,19 @@ void RadioLibWrapper::begin() {
 
   _noise_floor = 0;
   _threshold = 0;
+  _cad_enabled = false;
 
   // start average out some samples
   _num_floor_samples = 0;
   _floor_sample_sum = 0;
+}
+
+uint32_t RadioLibWrapper::getRngSeed() {
+  return _radio->random(0x7FFFFFFF);
+}
+
+void RadioLibWrapper::setTxPower(int8_t dbm) {
+  _radio->setOutputPower(dbm);
 }
 
 void RadioLibWrapper::idle() {
@@ -53,13 +64,24 @@ void RadioLibWrapper::triggerNoiseFloorCalibrate(int threshold) {
   }
 }
 
+void RadioLibWrapper::doResetAGC() {
+  _radio->sleep();  // warm sleep to reset analog frontend
+}
+
 void RadioLibWrapper::resetAGC() {
   // make sure we're not mid-receive of packet!
   if ((state & STATE_INT_READY) != 0 || isReceivingPacket()) return;
 
-  // NOTE: according to higher powers, just issuing RadioLib's startReceive() will reset the AGC.
-  //      revisit this if a better impl is discovered.
+  doResetAGC();
   state = STATE_IDLE;   // trigger a startReceive()
+
+  // Reset noise floor sampling so it reconverges from scratch.
+  // Without this, a stuck _noise_floor of -120 makes the sampling threshold
+  // too low (-106) to accept normal samples (~-105), self-reinforcing the
+  // stuck value even after the receiver has recovered.
+  _noise_floor = 0;
+  _num_floor_samples = 0;
+  _floor_sample_sum = 0;
 }
 
 void RadioLibWrapper::loop() {
@@ -105,6 +127,7 @@ int RadioLibWrapper::recvRaw(uint8_t* bytes, int sz) {
       if (err != RADIOLIB_ERR_NONE) {
         MESH_DEBUG_PRINTLN("RadioLibWrapper: error: readData(%d)", err);
         len = 0;
+        n_recv_errors++;
       } else {
       //  Serial.print("  readData() -> "); Serial.println(len);
         n_recv++;
@@ -156,10 +179,26 @@ void RadioLibWrapper::onSendFinished() {
   state = STATE_IDLE;
 }
 
+int16_t RadioLibWrapper::performChannelScan() {
+  return _radio->scanChannel();
+}
+
 bool RadioLibWrapper::isChannelActive() {
-  return _threshold == 0 
-          ? false    // interference check is disabled
-          : getCurrentRSSI() > _noise_floor + _threshold;
+  // int.thresh: RSSI-based interference detection (relative to noise floor)
+  if (_threshold != 0 && getCurrentRSSI() > _noise_floor + _threshold) return true;
+
+  // cad: hardware channel activity detection
+  if (_cad_enabled) {
+    int16_t result = performChannelScan();
+    // scanChannel() triggers DIO interrupt (CAD done) which sets STATE_INT_READY
+    // via setFlag() ISR. Clear it before restarting RX so recvRaw() doesn't
+    // try to read a non-existent packet and count a spurious recv error.
+    state = STATE_IDLE;
+    startRecv();
+    if (result != RADIOLIB_CHANNEL_FREE) return true;
+  }
+
+  return false;
 }
 
 float RadioLibWrapper::getLastRSSI() const {

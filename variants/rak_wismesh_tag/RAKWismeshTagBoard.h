@@ -8,9 +8,9 @@
 #define  PIN_VBAT_READ    5
 #define  ADC_MULTIPLIER   (3 * 1.73 * 1.187 * 1000)
 
-class RAKWismeshTagBoard : public NRF52BoardDCDC, public NRF52BoardOTA {
+class RAKWismeshTagBoard : public NRF52BoardDCDC {
 public:
-  RAKWismeshTagBoard() : NRF52BoardOTA("WISMESHTAG_OTA") {}
+  RAKWismeshTagBoard() : NRF52Board("WISMESHTAG_OTA") {}
   void begin();
 
 #if defined(P_LORA_TX_LED) && defined(LED_STATE_ON)
@@ -69,6 +69,6 @@ public:
     nrf_gpio_cfg_sense_input(digitalPinToInterrupt(BUTTON_PIN), NRF_GPIO_PIN_PULLUP, NRF_GPIO_PIN_SENSE_LOW);
     #endif
 
-    sd_power_system_off();
+    NRF52Board::powerOff();
   }
 };

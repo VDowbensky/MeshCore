@@ -10,8 +10,21 @@
 #define Y_OFFSET 1  // Vertical offset to prevent top row cutoff
 #endif
 
-#define SCALE_X  1.875f     // 240 / 128
-#define SCALE_Y  2.109375f   // 135 / 64
+#ifdef HELTEC_VISION_MASTER_T190
+  #define SCALE_X  2.5f        // 320 / 128
+  #define SCALE_Y  2.65625f    // 170 / 64
+#else
+  #define SCALE_X  1.875f      // 240 / 128
+  #define SCALE_Y  2.109375f   // 135 / 64
+#endif
+
+#ifdef DISPLAY_SCALE_X
+  #define SCALE_X DISPLAY_SCALE_X
+#endif
+
+#ifdef DISPLAY_SCALE_Y
+  #define SCALE_Y DISPLAY_SCALE_Y
+#endif
 
 bool ST7789Display::begin() {
   if(!_isOn) {
@@ -27,6 +40,9 @@ bool ST7789Display::begin() {
 
     display.init();
     display.landscapeScreen();
+    #ifdef DISPLAY_FLIP_VERTICALLY
+    display.flipScreenVertically();
+    #endif
     display.displayOn();
     setCursor(0,0);
 
@@ -44,6 +60,9 @@ void ST7789Display::turnOn() {
     // Re-initialize the display
     display.init();
     display.displayOn();
+    #ifdef DISPLAY_FLIP_VERTICALLY
+    display.flipScreenVertically();
+    #endif
     delay(20);
 
     // Now turn on the backlight

@@ -13,9 +13,9 @@
 #define PIN_VBAT_READ     (4)
 #define REAL_VBAT_MV_PER_LSB (VBAT_DIVIDER_COMP * VBAT_MV_PER_LSB)
 
-class ThinkNodeM1Board : public NRF52BoardOTA {
+class ThinkNodeM1Board : public NRF52Board {
 public:
-  ThinkNodeM1Board() : NRF52BoardOTA("THINKNODE_M1_OTA") {}
+  ThinkNodeM1Board() : NRF52Board("THINKNODE_M1_OTA") {}
   void begin();
   uint16_t getBattMilliVolts() override;
 
@@ -40,7 +40,6 @@ public:
     #endif
 
     // power off board
-    sd_power_system_off();
-
+    NRF52Board::powerOff();
   }
 };

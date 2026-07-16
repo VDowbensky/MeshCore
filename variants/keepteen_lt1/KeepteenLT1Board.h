@@ -4,12 +4,12 @@
 #include <Arduino.h>
 #include <helpers/NRF52Board.h>
 
-class KeepteenLT1Board : public NRF52BoardOTA {
+class KeepteenLT1Board : public NRF52Board {
 protected:
   uint8_t btn_prev_state;
 
 public:
-  KeepteenLT1Board() : NRF52BoardOTA("KeepteenLT1_OTA") {}
+  KeepteenLT1Board() : NRF52Board("KeepteenLT1_OTA") {}
   void begin();
 
   #define BATTERY_SAMPLES 8
@@ -37,8 +37,4 @@ public:
     digitalWrite(P_LORA_TX_LED, LOW);   // turn TX LED off
   }
 #endif
-
-  void powerOff() override {
-    sd_power_system_off();
-  }
 };

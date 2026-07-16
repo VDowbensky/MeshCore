@@ -20,12 +20,12 @@
 #define  PIN_VBAT_READ BATTERY_PIN
 #define  ADC_MULTIPLIER   (1.815f) // dependent on voltage divider resistors. TODO: more accurate battery tracking
 
-class MinewsemiME25LS01Board : public NRF52BoardOTA {
+class MinewsemiME25LS01Board : public NRF52BoardDCDC {
 protected:
   uint8_t btn_prev_state;
 
 public:
-  MinewsemiME25LS01Board() : NRF52BoardOTA("Minewsemi_OTA") {}
+  MinewsemiME25LS01Board() : NRF52Board("Minewsemi_OTA") {}
   void begin();
 
 #define BATTERY_SAMPLES 8
@@ -63,9 +63,9 @@ public:
     digitalWrite(LED_PIN, LOW);
     #endif
     #ifdef BUTTON_PIN
-    nrf_gpio_cfg_sense_input(digitalPinToInterrupt(BUTTON_PIN), NRF_GPIO_PIN_PULLUP, NRF_GPIO_PIN_SENSE_HIGH);
+    nrf_gpio_cfg_sense_input(digitalPinToInterrupt(BUTTON_PIN), NRF_GPIO_PIN_PULLUP, NRF_GPIO_PIN_SENSE_LOW);
     #endif
-    sd_power_system_off();
+    NRF52Board::powerOff();
   }
 
   #if defined(P_LORA_TX_LED)

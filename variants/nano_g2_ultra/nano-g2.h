@@ -37,9 +37,9 @@
 
 class NanoG2Ultra : public NRF52Board {
 public:
+  NanoG2Ultra() : NRF52Board("NANO_G2_OTA") {}
   void begin();
   uint16_t getBattMilliVolts() override;
-  bool startOTAUpdate(const char *id, char reply[]) override;
 
   const char *getManufacturerName() const override { return "Nano G2 Ultra"; }
 
@@ -52,6 +52,6 @@ public:
     nrf_gpio_cfg_sense_input(digitalPinToInterrupt(PIN_USER_BTN), NRF_GPIO_PIN_NOPULL,
                              NRF_GPIO_PIN_SENSE_LOW);
 
-    sd_power_system_off();
+    NRF52Board::powerOff();
   }
 };
