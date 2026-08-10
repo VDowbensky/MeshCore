@@ -568,7 +568,7 @@ void setup() {
 
   fast_rng.begin(radio_driver.getRngSeed());
 
-#if defined(NRF52_PLATFORM)
+#if defined(NRF52_PLATFORM)  || defined(STM32_PLATFORM)
   InternalFS.begin();
   the_mesh.begin(InternalFS);
 #elif defined(RP2040_PLATFORM)
