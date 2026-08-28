@@ -4,6 +4,17 @@
 #include <Arduino.h>
 #include <helpers/NRF52Board.h>
 
+//#define P_LORA_NSS   45 //P1.13 45
+//#define P_LORA_DIO_1 10 //P0.10 10
+//#define P_LORA_RESET 9 //P0.09 9
+//#define P_LORA_BUSY  29 //P0.29 29
+//#define P_LORA_MISO  2 //P0.02 2
+//#define P_LORA_SCLK  43 //P1.11 43
+//#define P_LORA_MOSI  47 //P1.15 47
+//#define SX126X_POWER_EN 21 //P0.13 13
+//#define SX126X_RXEN  17 //P0.17
+//#define SX126X_TXEN RADIOLIB_NC
+
 #define P_LORA_NSS 13 //P1.13 45
 #define P_LORA_DIO_1 11 //P0.10 10
 #define P_LORA_RESET 10 //P0.09 9
@@ -14,6 +25,7 @@
 #define SX126X_POWER_EN 21 //P0.13 13
 #define SX126X_RXEN 2 //P0.17
 #define SX126X_TXEN RADIOLIB_NC
+
 #define SX126X_DIO2_AS_RF_SWITCH  true
 #define SX126X_DIO3_TCXO_VOLTAGE (1.8f)
 

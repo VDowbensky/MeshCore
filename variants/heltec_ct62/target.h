@@ -8,7 +8,7 @@
 #include <helpers/AutoDiscoverRTCClock.h>
 #include <helpers/SensorManager.h>
 
-#define DISPLAY_CLASS SSD1306Display
+//#define DISPLAY_CLASS SSD1306Display
 
 
 #ifdef DISPLAY_CLASS

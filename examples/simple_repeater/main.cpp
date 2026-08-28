@@ -62,9 +62,19 @@ void setup() {
 
   if (!radio_init()) {
     MESH_DEBUG_PRINTLN("Radio init failed!");
-    halt();
+    display.startFrame();
+    display.setCursor(0, 32);
+    display.print("Radio Init error.");
+    display.endFrame();
+    //halt();
   }
-
+  else
+  {
+    display.startFrame();
+    display.setCursor(0, 32);
+    display.print("Radio Init OK.");
+    display.endFrame();
+  }
   fast_rng.begin(radio_driver.getRngSeed());
 
   FILESYSTEM* fs;

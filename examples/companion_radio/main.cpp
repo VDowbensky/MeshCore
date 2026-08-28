@@ -134,7 +134,17 @@ void setup() {
   }
 #endif
 
-  if (!radio_init()) { halt(); }
+  if (!radio_init()) 
+  { 
+    disp->drawTextCentered(disp->width() / 2, 48, "Radio init error.");
+    disp->endFrame();
+    //halt(); 
+  }
+  else
+  {
+    disp->drawTextCentered(disp->width() / 2, 48, "Radio init OK.");
+    disp->endFrame();
+  }
 
   fast_rng.begin(radio_driver.getRngSeed());
 
