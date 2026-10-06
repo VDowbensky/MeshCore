@@ -2,7 +2,11 @@
 #include "target.h"
 #include <helpers/ArduinoHelpers.h>
 
+<<<<<<< Updated upstream
 E77Board board;
+=======
+E77board board;
+>>>>>>> Stashed changes
 
 RADIO_CLASS radio = new STM32WLx_Module();
 
@@ -55,6 +59,7 @@ bool radio_init() {
   return true;  // success
 }
 
+<<<<<<< Updated upstream
 uint32_t radio_get_rng_seed() {
   return radio.random(0x7FFFFFFF);
 }
@@ -70,6 +75,8 @@ void radio_set_tx_power(uint8_t dbm) {
   radio.setOutputPower(dbm);
 }
 
+=======
+>>>>>>> Stashed changes
 mesh::LocalIdentity radio_new_identity() {
   RadioNoiseListener rng(radio);
   return mesh::LocalIdentity(&rng);  // create new random identity
