@@ -223,10 +223,22 @@ void setup() {
 #endif
 
 // add hardware serial interface
+//#if defined(SERIAL_RX)
+//  companion_serial.setPins(SERIAL_RX, SERIAL_TX);
+//  companion_serial.begin(115200);
+//  hardware_serial_interface.begin(companion_serial);
+//  interface_manager.addInterface(InterfaceType::HardwareSerial, &hardware_serial_interface);
+//#endif
+
 #if defined(SERIAL_RX)
-  companion_serial.setPins(SERIAL_RX, SERIAL_TX);
-  companion_serial.begin(115200);
-  hardware_serial_interface.begin(companion_serial);
+  // 1. Ініціалізуємо фізичний UART порт (швидкість для Companion зазвичай 115200)
+  // В STM32Duino для STM32WLE5 об'єкт Serial або Serial2 вже прив'язаний до правильних пінів через variant
+  Serial.begin(115200); 
+
+  // 2. Ініціалізуємо інтерфейсну обгортку MeshCore, передаючи їй посилання на наш Serial
+  hardware_serial_interface.begin(Serial);
+
+  // 3. Додаємо цей інтерфейс до менеджера інтерфейсів MeshCore
   interface_manager.addInterface(InterfaceType::HardwareSerial, &hardware_serial_interface);
 #endif
 
